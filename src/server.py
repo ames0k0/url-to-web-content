@@ -37,14 +37,16 @@ class WCLPlaywright:
 
 
 class Server:
+    HOST: str = "0.0.0.0"
+    PORT: int = 8888
     instance: str | None = None
 
     @classmethod
     async def initiate(cls):
         cls.instance = await asyncio.start_server(
-            cls.handle_echo,
-            '127.0.0.1',
-            8888
+            cls.handle_requests,
+            host=cls.HOST,
+            port=cls.PORT,
         )
         addrs = ', '.join(str(sock.getsockname()) for sock in cls.instance.sockets)
         print(f'Serving on {addrs}')
@@ -63,8 +65,7 @@ class Server:
             queries=queries
         )
 
-
-    async def handle_echo(reader, writer):
+    async def handle_requests(reader, writer):
         data = await reader.read(100)
         message = data.decode()
         addr = writer.get_extra_info('peername')
@@ -94,15 +95,18 @@ async def terminate():
 
 
 async def main():
-    await initiate()
-
     try:
         async with Server.instance:
             await Server.instance.serve_forever()
     except Exception as e:
         print(e.args[0])
 
-    await terminate()
 
-
-asyncio.run(main())
+if __name__ == "__main__":
+    with asyncio.Runner() as runner:
+        runner.run(initiate())
+        try:
+            runner.run(main())
+        except KeyboardInterrupt:
+            pass
+        runner.run(terminate())

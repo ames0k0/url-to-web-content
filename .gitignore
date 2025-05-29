@@ -1,2 +1,5 @@
 *.bkp
 .python-version
+data
+
+!./data/index.html
