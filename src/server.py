@@ -1,4 +1,3 @@
-
 import asyncio
 from dataclasses import dataclass
 from urllib.parse import urlparse, parse_qs
@@ -20,7 +19,7 @@ class WCLPlaywright:
     @classmethod
     async def initiate(cls):
         cls.context = await async_playwright().start()
-        cls.browser = await cls.context.chromium.launch(headless=False)
+        cls.browser = await cls.context.chromium.launch(headless=True)
     @classmethod
     async def terminate(cls):
         await cls.browser.close()
@@ -74,8 +73,11 @@ class Server:
 
         request_header = Server.parse_request_header(message=message)
 
-        print(f"Send: {message!r}")
-        writer.write(data)
+        for url in request_header.queries.get("url", []):
+            content = await WCLPlaywright.get_content(url=url)
+            writer.write(data)
+            print(f"Sent: {len(content)} bytes.")
+
         await writer.drain()
 
         print("Close the connection")
@@ -86,10 +88,10 @@ class Server:
 
 async def initiate():
     await Server.initiate()
-    # await WCLPlaywright.initiate()
+    await WCLPlaywright.initiate()
 async def terminate():
     await Server.terminate()
-    # await WCLPlaywright.terminate()
+    await WCLPlaywright.terminate()
 
 
 async def main():
