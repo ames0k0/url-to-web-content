@@ -13,7 +13,7 @@ class RequestHeader:
     queries: dict[str, list[str]]
 
 
-class Playwright:
+class WCLPlaywright:
     context: str | None = None
     browser: str | None = None
 
@@ -86,10 +86,10 @@ class Server:
 
 async def initiate():
     await Server.initiate()
-    # await Playwright.initiate()
+    # await WCLPlaywright.initiate()
 async def terminate():
     await Server.terminate()
-    # await Playwright.terminate()
+    # await WCLPlaywright.terminate()
 
 
 async def main():

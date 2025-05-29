@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.5 Chrome/134.0.6998.205 Electron/35.3.0 Safari/537.36" version="27.0.5">
   <diagram name="Page-1" id="-vaWyrcWgSKskyz38Z6i">
-    <mxGraphModel dx="951" dy="482" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1148" dy="581" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -13,14 +13,17 @@
         <mxCell id="sFEHvg0e0UvxJ46D8FWg-17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="sFEHvg0e0UvxJ46D8FWg-2" target="sFEHvg0e0UvxJ46D8FWg-16">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="sFEHvg0e0UvxJ46D8FWg-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="sFEHvg0e0UvxJ46D8FWg-2" target="sFEHvg0e0UvxJ46D8FWg-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="sFEHvg0e0UvxJ46D8FWg-2" value="Web Content Loader" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="320" y="320" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="sFEHvg0e0UvxJ46D8FWg-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="sFEHvg0e0UvxJ46D8FWg-4" target="sFEHvg0e0UvxJ46D8FWg-7">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="560" y="500" />
-              <mxPoint x="560" y="100" />
+              <mxPoint x="600" y="500" />
+              <mxPoint x="600" y="100" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -42,8 +45,14 @@
         <mxCell id="sFEHvg0e0UvxJ46D8FWg-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="sFEHvg0e0UvxJ46D8FWg-16" target="sFEHvg0e0UvxJ46D8FWg-4">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="sFEHvg0e0UvxJ46D8FWg-16" value="Playwright" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="360" y="400" width="80" height="40" as="geometry" />
+        <mxCell id="sFEHvg0e0UvxJ46D8FWg-16" value="HTTPX" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="400" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sFEHvg0e0UvxJ46D8FWg-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="sFEHvg0e0UvxJ46D8FWg-20" target="sFEHvg0e0UvxJ46D8FWg-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sFEHvg0e0UvxJ46D8FWg-20" value="Playwright" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="400" width="80" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
