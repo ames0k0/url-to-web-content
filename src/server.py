@@ -37,54 +37,71 @@ class Playwright:
         return content
 
 
-def parse_request_header(*, message: str) -> RequestHeader:
-    method, endpoint = message.split()[:2]
-    parsed_endpoint = urlparse(endpoint)
-    queries = parse_qs(parsed_endpoint.query)
-    return RequestHeader(
-        method=method,
-        router=parsed_endpoint.path, 
-        queries=queries
-    )
+class Server:
+    instance: str | None = None
+
+    @classmethod
+    async def initiate(cls):
+        cls.instance = await asyncio.start_server(
+            cls.handle_echo,
+            '127.0.0.1',
+            8888
+        )
+        addrs = ', '.join(str(sock.getsockname()) for sock in cls.instance.sockets)
+        print(f'Serving on {addrs}')
+    @classmethod
+    async def terminate(cls):
+        pass
+
+    @staticmethod
+    def parse_request_header(*, message: str) -> RequestHeader:
+        method, endpoint = message.split()[:2]
+        parsed_endpoint = urlparse(endpoint)
+        queries = parse_qs(parsed_endpoint.query)
+        return RequestHeader(
+            method=method,
+            router=parsed_endpoint.path,
+            queries=queries
+        )
 
 
-async def handle_echo(reader, writer):
-    data = await reader.read(100)
-    message = data.decode()
-    addr = writer.get_extra_info('peername')
+    async def handle_echo(reader, writer):
+        data = await reader.read(100)
+        message = data.decode()
+        addr = writer.get_extra_info('peername')
 
-    print(f"Received {message!r} from {addr!r}")
+        print(f"Received {message!r} from {addr!r}")
 
-    request_header = parse_request_header(message=message)
+        request_header = Server.parse_request_header(message=message)
 
-    print(f"Send: {message!r}")
-    writer.write(data)
-    await writer.drain()
+        print(f"Send: {message!r}")
+        writer.write(data)
+        await writer.drain()
 
-    print("Close the connection")
-    writer.close()
-    await writer.wait_closed()
-    print(request_header)
+        print("Close the connection")
+        writer.close()
+        await writer.wait_closed()
+        print(request_header)
 
 
 async def initiate():
-    await Playwright.initiate()
+    await Server.initiate()
+    # await Playwright.initiate()
 async def terminate():
-    await Playwright.terminate()
+    await Server.terminate()
+    # await Playwright.terminate()
 
 
 async def main():
-    server = await asyncio.start_server(
-        handle_echo,
-        '127.0.0.1',
-        8888
-    )
+    await initiate()
 
-    addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    print(f'Serving on {addrs}')
+    try:
+        async with Server.instance:
+            await Server.instance.serve_forever()
+    except Exception as e:
+        print(e.args[0])
 
-    async with server:
-        await server.serve_forever()
+    await terminate()
 
 
 asyncio.run(main())
