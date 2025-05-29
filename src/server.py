@@ -73,12 +73,11 @@ class Server:
 
         request_header = Server.parse_request_header(message=message)
 
-        for url in request_header.queries.get("url", []):
+        for url in request_header.queries.get("url", [])[:1]:
             content = await WCLPlaywright.get_content(url=url)
-            writer.write(data)
+            writer.write(content.encode())
             print(f"Sent: {len(content)} bytes.")
-
-        await writer.drain()
+            await writer.drain()
 
         print("Close the connection")
         writer.close()
