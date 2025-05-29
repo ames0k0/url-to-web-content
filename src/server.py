@@ -1,6 +1,9 @@
+
 import asyncio
 from dataclasses import dataclass
 from urllib.parse import urlparse, parse_qs
+
+from playwright.async_api import async_playwright
 
 
 @dataclass
@@ -8,6 +11,30 @@ class RequestHeader:
     method: str
     router: str
     queries: dict[str, list[str]]
+
+
+class Playwright:
+    context: str | None = None
+    browser: str | None = None
+
+    @classmethod
+    async def initiate(cls):
+        cls.context = await async_playwright().start()
+        cls.browser = await cls.context.chromium.launch(headless=False)
+    @classmethod
+    async def terminate(cls):
+        await cls.browser.close()
+        await cls.context.stop()
+
+    @classmethod
+    async def get_content(cls, url: str) -> str:
+        page = await cls.browser.new_page()
+        await page.goto(url)
+
+        content = await page.content()
+        await page.close()
+
+        return content
 
 
 def parse_request_header(*, message: str) -> RequestHeader:
@@ -38,6 +65,12 @@ async def handle_echo(reader, writer):
     writer.close()
     await writer.wait_closed()
     print(request_header)
+
+
+async def initiate():
+    await Playwright.initiate()
+async def terminate():
+    await Playwright.terminate()
 
 
 async def main():
