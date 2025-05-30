@@ -3,15 +3,18 @@
 Server
 ```bash
 uv run python src/server.py
+# Serving on ('0.0.0.0', 8888)
 ```
 
 API Example
 ```
-GET http://127.0.0.1:8888/get?url=<url>
+GET http://0.0.0.0:8888/get?url=<url>
 ```
 
 Test with Client
 ```bash
 uv run python -m http.server --directory data
-uv run python src/client.py
+uv run python src/client.py [asyncio,httpx]
+# Received: 121 bytes.
+# Received: 138 bytes.
 ```
