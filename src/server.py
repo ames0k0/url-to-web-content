@@ -73,17 +73,17 @@ class Server:
         print(f"Received {message!r} from {addr!r}")
 
         request_header = Server.parse_request_header(message=message)
+        response_tmp = "HTTP/1.1 200 OK\n\n{content}"
 
         for url in request_header.queries.get("url", [])[:1]:
             content = await WCLPlaywright.get_content(url=url)
-            writer.write(content.encode())
+            writer.write(response_tmp.format(content=content).encode())
             print(f"Sent: {len(content)} bytes.")
             await writer.drain()
 
         print("Close the connection")
         writer.close()
         await writer.wait_closed()
-        print(request_header)
 
 
 async def initiate():
