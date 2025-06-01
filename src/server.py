@@ -22,8 +22,8 @@ class WCLPlaywright:
         cls.browser = await cls.context.chromium.launch(headless=True)
     @classmethod
     async def terminate(cls):
-        await cls.browser.close()
         await cls.context.stop()
+        await cls.browser.close()
 
     @classmethod
     async def get_content(cls, url: str) -> str:
