@@ -40,6 +40,9 @@ class Server:
     HOST: str = "0.0.0.0"
     PORT: int = 8888
     instance: str | None = None
+    settings: dict = {
+        "wcl_max_worker_count": 5,
+    }
 
     @classmethod
     async def initiate(cls):
