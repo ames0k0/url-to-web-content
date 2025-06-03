@@ -8,7 +8,7 @@ uv run python src/server.py
 
 API Example
 ```
-GET http://0.0.0.0:8888/get?url=<url>
+GET http://0.0.0.0:8888/wcl?url=<url>
 ```
 
 Test with Client
