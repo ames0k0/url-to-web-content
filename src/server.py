@@ -88,7 +88,7 @@ class Server:
         request_header = Server.parse_request_header(message=message)
 
         if request_header.router == "/wcl":
-            await handle_wcl_request(writer, request_header)
+            await Server.handle_wcl_request(writer, request_header)
         else:
             writer.write(
                 Server.HTTPResponse.format(

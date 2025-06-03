@@ -9,7 +9,7 @@ SERVER_HOST = "0.0.0.0"
 SERVER_PORT = 8888
 SERVER_URL = f"http://{SERVER_HOST}:{SERVER_PORT}"
 TARGET_URL = "http://0.0.0.0:8000"
-REQUEST_URL = f"{SERVER_URL}/get?url={TARGET_URL}"
+REQUEST_URL = f"{SERVER_URL}/wcl?url={TARGET_URL}"
 REQUEST_METHOD = "GET"
 OUTPUT_FILEPATH = os.path.join("data", "server_content.html")
 
