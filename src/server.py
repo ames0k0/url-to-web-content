@@ -39,6 +39,7 @@ class WCLPlaywright:
 class Server:
     HOST: str = "0.0.0.0"
     PORT: int = 8888
+    HTTPResponse: str = "HTTP/1.1 {STATUS_CODE} {STATUS_DETAILS}\n\n{MESSAGE}"
     instance: str | None = None
     settings: dict = {
         "wcl_max_worker_count": 5,
@@ -68,23 +69,35 @@ class Server:
             queries=queries
         )
 
-    async def handle_requests(reader, writer):
-        data = await reader.read(100)
-        message = data.decode()
-        addr = writer.get_extra_info('peername')
-
-        print(f"Received {message!r} from {addr!r}")
-
-        request_header = Server.parse_request_header(message=message)
-        response_tmp = "HTTP/1.1 200 OK\n\n{content}"
-
+    async def handle_wcl_request(writer, request_header):
         for url in request_header.queries.get("url", [])[:1]:
             content = await WCLPlaywright.get_content(url=url)
-            writer.write(response_tmp.format(content=content).encode())
-            print(f"Sent: {len(content)} bytes.")
+            writer.write(
+                Server.HTTPResponse.format(
+                    STATUS_CODE=200,
+                    STATUS_DETAILS="OK",
+                    MESSAGE=content,
+                ).encode()
+            )
             await writer.drain()
 
-        print("Close the connection")
+    async def handle_requests(reader, writer):
+        data = await reader.read(100)
+
+        message = data.decode()
+        request_header = Server.parse_request_header(message=message)
+
+        if request_header.router == "/wcl":
+            await handle_wcl_request(writer, request_header)
+        else:
+            writer.write(
+                Server.HTTPResponse.format(
+                    STATUS_CODE=404,
+                    STATUS_DETAILS="SupportedRouters: /wcl",
+                    MESSAGE="",
+                ).encode()
+            )
+
         writer.close()
         await writer.wait_closed()
 
