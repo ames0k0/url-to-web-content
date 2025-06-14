@@ -1,9 +1,21 @@
 services:
+  u2wc__playwright_server:
+    image: mcr.microsoft.com/playwright:v1.52.0
+    user: pwuser
+    ipc: host
+    init: true
+    security_opt:
+      - seccomp=./deploy/pw/seccomp_profile.json
+    network_mode: host
+    command: ["/bin/sh", "-c", "npx -y playwright@1.52.0 run-server --port 3000 --host 0.0.0.0"]
+    restart: unless-stopped
+
   u2wc__server:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 8888:8888
-    image: u2wc__server:0.0.1
+    image: u2wc__server:0.0.2
+    network_mode: host
+    depends_on:
+      - u2wc__playwright_server
     restart: unless-stopped

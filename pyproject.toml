@@ -1,6 +1,6 @@
 [project]
 name = "url-to-web-content"
-version = "0.0.1"
+version = "0.0.2"
 description = "URL to Web Content"
 readme = "README.md"
 requires-python = ">=3.12"

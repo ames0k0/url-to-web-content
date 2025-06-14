@@ -2,7 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from urllib.parse import urlparse, parse_qs
 
-from playwright.async_api import async_playwright
+from playwright.async_api import Playwright, Browser, async_playwright
 
 
 @dataclass
@@ -13,22 +13,32 @@ class RequestHeader:
 
 
 class WCLPlaywright:
-    context: str | None = None
-    browser: str | None = None
-
     @classmethod
     async def initiate(cls):
-        cls.context = await async_playwright().start()
-        cls.browser = await cls.context.chromium.launch(headless=True)
+        cls.context: Playwright = await async_playwright().start()
+        # FIXFOR (ames0k0): `depends_on` by creation, not healthcheck
+        while True:
+            try:
+                cls.browser: Browser = await cls.context.chromium.connect(
+                    "ws://0.0.0.0:3000/",
+                )
+                break
+            except Exception as e:
+                print("SLEEP(1): ERR>", e.args[0])
+                await asyncio.sleep(1)
+
     @classmethod
     async def terminate(cls):
-        await cls.context.stop()
-        await cls.browser.close()
+        if cls.context:
+            await cls.context.stop()
+        if cls.browser:
+            await cls.browser.close()
 
     @classmethod
     async def get_content(cls, url: str) -> str:
         page = await cls.browser.new_page()
         await page.goto(url)
+        await page.wait_for_load_state("load")
 
         content = await page.content()
         await page.close()
@@ -40,20 +50,20 @@ class Server:
     HOST: str = "0.0.0.0"
     PORT: int = 8888
     HTTPResponse: str = "HTTP/1.1 {STATUS_CODE} {STATUS_DETAILS}\n\n{MESSAGE}"
-    instance: str | None = None
     settings: dict = {
         "wcl_max_worker_count": 5,
     }
 
     @classmethod
     async def initiate(cls):
-        cls.instance = await asyncio.start_server(
+        cls.instance: asyncio.base_events.Server = await asyncio.start_server(
             cls.handle_requests,
             host=cls.HOST,
             port=cls.PORT,
         )
-        addrs = ', '.join(str(sock.getsockname()) for sock in cls.instance.sockets)
-        print(f'Serving on {addrs}')
+        addrs = (str(sock.getsockname()) for sock in cls.instance.sockets)
+        print("Serving on %s" % ", ".join(addrs))
+
     @classmethod
     async def terminate(cls):
         pass
@@ -69,6 +79,7 @@ class Server:
             queries=queries
         )
 
+    @staticmethod
     async def handle_wcl_request(writer, request_header):
         for url in request_header.queries.get("url", [])[:1]:
             content = await WCLPlaywright.get_content(url=url)
@@ -81,6 +92,7 @@ class Server:
             )
             await writer.drain()
 
+    @staticmethod
     async def handle_requests(reader, writer):
         data = await reader.read(100)
 
@@ -105,12 +117,16 @@ class Server:
 async def initiate():
     await Server.initiate()
     await WCLPlaywright.initiate()
+
+
 async def terminate():
     await Server.terminate()
     await WCLPlaywright.terminate()
 
 
 async def main():
+    if not Server.instance:
+        return
     try:
         async with Server.instance:
             await Server.instance.serve_forever()
