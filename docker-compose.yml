@@ -1,0 +1,9 @@
+services:
+  u2wc__server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8888
+    image: u2wc__server:0.0.1
+    restart: unless-stopped
