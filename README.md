@@ -1,7 +1,13 @@
 <p align="center"><img src="./_readme/Diagram.drawio.png" /></p>
 
-Server
+Run Server
 ```bash
+docker compose up -d
+```
+
+Development
+```bash
+docker compose up -d u2wc__playwright_server
 uv run python src/server.py
 # Serving on ('0.0.0.0', 8888)
 ```

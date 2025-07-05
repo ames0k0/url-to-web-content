@@ -37,8 +37,7 @@ class WCLPlaywright:
     @classmethod
     async def get_content(cls, url: str) -> str:
         page = await cls.browser.new_page()
-        await page.goto(url)
-        await page.wait_for_load_state("load")
+        await page.goto(url, wait_until="load")
 
         content = await page.content()
         await page.close()
@@ -50,7 +49,8 @@ class Server:
     HOST: str = "0.0.0.0"
     PORT: int = 8888
     HTTPResponse: str = "HTTP/1.1 {STATUS_CODE} {STATUS_DETAILS}\n\n{MESSAGE}"
-    settings: dict = {
+
+    SETTINGS: dict = {
         "wcl_max_worker_count": 5,
     }
 
@@ -82,14 +82,24 @@ class Server:
     @staticmethod
     async def handle_wcl_request(writer, request_header):
         for url in request_header.queries.get("url", [])[:1]:
-            content = await WCLPlaywright.get_content(url=url)
-            writer.write(
-                Server.HTTPResponse.format(
-                    STATUS_CODE=200,
-                    STATUS_DETAILS="OK",
-                    MESSAGE=content,
-                ).encode()
-            )
+            try:
+                content = await WCLPlaywright.get_content(url=url)
+            except Exception as e:
+                writer.write(
+                    Server.HTTPResponse.format(
+                        STATUS_CODE=400,
+                        STATUS_DETAILS="Bad Request",
+                        MESSAGE=e.args[0],
+                    ).encode()
+                )
+            else:
+                writer.write(
+                    Server.HTTPResponse.format(
+                        STATUS_CODE=200,
+                        STATUS_DETAILS="OK",
+                        MESSAGE=content,
+                    ).encode()
+                )
             await writer.drain()
 
     @staticmethod
